@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#2f4d6f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="אות תמה" />
+  <title>אות תמה</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icon-180.png" />
+  <link rel="icon" href="icon-180.png" />
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: #f3ead6; color: #1a1612;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main { max-width: 520px; margin: 0 auto; padding: 20px 16px 40px; }
+    h1 { font-size: 32px; margin: 8px 0; }
+    .card { background: #fffdf8; border-radius: 18px; padding: 16px; margin-top: 14px; box-shadow: 0 0 0 1px rgba(47,77,111,.12); }
+    ol { margin: 8px 0 0; padding: 0 18px 0 0; }
+    li { margin: 8px 0; line-height: 1.45; }
+    button, .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      height: 46px; border: 0; border-radius: 12px; padding: 0 16px;
+      background: #2f4d6f; color: #f3ead6; font-weight: 650; font-size: 16px;
+    }
+    textarea {
+      width: 100%; min-height: 140px; border: 0; border-radius: 12px;
+      background: #f3ead6; padding: 12px; font-size: 20px; line-height: 1.6;
+    }
+    .muted { color: #5c5348; font-size: 14px; line-height: 1.5; }
+    .hide { display: none; }
+    #out { white-space: pre-wrap; font-size: 15px; }
+  </style>
+</head>
+<body>
+  <main>
+    <img src="icon-180.png" alt="" width="64" height="64" />
+    <h1>אות תמה</h1>
+    <p class="muted">בודק מזוזות. האייקון נשמר מהקישור הזה, לא מהתצוגה הזמנית.</p>
+
+    <section id="install" class="card">
+      <strong>הוספה למסך הבית</strong>
+      <ol>
+        <li>פתחו את הקישור הזה ב-Safari, לא מתוך אפליקציה אחרת.</li>
+        <li>לחצו על כפתור השיתוף (הריבוע עם החץ).</li>
+        <li>גללו ובחרו «הוסף למסך הבית».</li>
+        <li>לחצו «הוסף». האייקון «אות תמה» יישאר במסך.</li>
+      </ol>
+      <p class="muted">באנדרואיד: תפריט Chrome ← «התקן אפליקציה» או «הוסף למסך הבית».</p>
+      <button id="android" class="hide" type="button">התקן למסך הבית</button>
+    </section>
+
+    <section class="card">
+      <strong>בדיקת נוסח</strong>
+      <p class="muted">הדביקו את האותיות. הבדיקה רצה במכשיר, בלי נקודות של Grok.</p>
+      <textarea id="text" placeholder="שמע ישראל…"></textarea>
+      <p><button id="go" type="button">בדוק אותיות</button></p>
+      <p id="out" class="muted"></p>
+    </section>
+  </main>
+  <script src="check.js"></script>
+  <script>
+    const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+    if (standalone) document.getElementById("install").classList.add("hide");
+
+    let deferred;
+    window.addEventListener("beforeinstallprompt", (event) => {
+      event.preventDefault();
+      deferred = event;
+      const btn = document.getElementById("android");
+      btn.classList.remove("hide");
+      btn.onclick = async () => {
+        deferred.prompt();
+        await deferred.userChoice;
+        deferred = null;
+        btn.classList.add("hide");
+      };
+    });
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+    }
+
+    document.getElementById("go").onclick = () => {
+      const result = Mezuzah.analyzeText(document.getElementById("text").value, true);
+      const lines = [result.summary, "חסרות: " + result.missingCount + " · יתרות: " + result.extraCount];
+      result.issues.slice(0, 12).forEach((issue) => lines.push(issue.title + " — " + issue.detail));
+      document.getElementById("out").textContent = lines.join("\n");
+    };
+  </script>
+</body>
+</html>
