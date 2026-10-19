@@ -1,0 +1,16 @@
+{
+  "name": "אות תמה",
+  "short_name": "אות תמה",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "dir": "rtl",
+  "lang": "he",
+  "background_color": "#f3ead6",
+  "theme_color": "#2f4d6f",
+  "icons": [
+    { "src": "/__grok/icon-180.png", "sizes": "180x180", "type": "image/png", "purpose": "any" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

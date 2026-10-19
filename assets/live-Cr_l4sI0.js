@@ -1,0 +1,1 @@
+var e=`ot-live-snap`;function t(t){localStorage.setItem(e,JSON.stringify(t))}function n(){try{let t=localStorage.getItem(e);if(!t)return null;let n=JSON.parse(t);return!n.summary||!n.at?null:n}catch{return null}}export{n,t};
