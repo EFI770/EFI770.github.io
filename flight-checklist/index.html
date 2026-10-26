@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="צ׳קליסט טיסה">
 <link rel="manifest" href="./manifest.json">
-<link rel="icon" href="./icon.svg?v=4" type="image/svg+xml">
-<link rel="apple-touch-icon" href="./icon.svg?v=4">
+<link rel="icon" href="./icon.svg?v=6" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon.svg?v=6">
 <title>צ׳קליסט הכנה לטיסה ✈️</title>
 <style>:root{color-scheme:light;--navy:#24205f;--navy2:#30296f;--wine:#8b3047;--gold:#e0a02b;--paper:#fbfaf8;--white:#fff;--line:#e6e1df;--muted:#686779}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;background:var(--paper);color:var(--navy);font-family:system-ui,-apple-system,"Rubik",Arial,sans-serif;line-height:1.6}button{font:inherit;cursor:pointer}
@@ -30,7 +30,7 @@
 </head>
 <body>
 <header class="sticky"><div class="top">
-<div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div class="brand"><img class="brandmark" src="./icon.svg?v=5" alt="לוגו טוס טורס"><div class="brandcopy"><strong>צ׳קליסט הכנה לטיסה</strong><div class="tagline">טסים בראש שקט • מהכרטיס ועד הנחיתה</div></div></div><strong id="percent" style="font-size:22px;color:var(--wine)">0%</strong></div>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div class="brand"><img class="brandmark" src="./icon.svg?v=6" alt="לוגו טוס טורס"><div class="brandcopy"><strong>צ׳קליסט הכנה לטיסה</strong><div class="tagline">טסים בראש שקט • מהכרטיס ועד הנחיתה</div></div></div><strong id="percent" style="font-size:22px;color:var(--wine)">0%</strong></div>
 <div class="progress"><div id="fill" class="fill"></div></div><div id="count" class="muted" style="margin-top:5px">0 / 76 הושלמו</div>
 </div></header>
 <main class="wrap">
@@ -69,7 +69,7 @@ document.getElementById('cancelReset').addEventListener('click',()=>document.get
 document.getElementById('confirmReset').addEventListener('click',()=>{state={checked:{},open:{}};save();render();document.getElementById('resetModal').style.display='none';toast('הצ׳קליסט אופס')});
 document.getElementById('closeCelebrate').addEventListener('click',()=>document.getElementById('celebrate').style.display='none');
 document.getElementById('share').addEventListener('click',async()=>{let text='✈️ צ׳קליסט טיסה: '+Math.round(done()/total()*100)+'% הושלם ('+done()+'/'+total()+')\n\n';SECTIONS.forEach((s,si)=>{const n=s.items.filter((_,ii)=>state.checked[si+'-'+ii]).length;text+=s.icon+' '+s.t+': '+n+'/'+s.items.length+'\n'});try{if(navigator.share){await navigator.share({title:'התקדמות צ׳קליסט טיסה',text});return}await navigator.clipboard.writeText(text);toast('ההתקדמות הועתקה 📋')}catch{const ta=document.createElement('textarea');ta.value=text;document.body.append(ta);ta.select();try{document.execCommand('copy');toast('ההתקדמות הועתקה 📋')}catch{prompt('העתיקו את ההתקדמות:',text)}ta.remove()}});
-if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=6', {updateViaCache:'none'}).catch(()=>{}));
 document.getElementById('installHint').style.display=window.matchMedia('(display-mode: standalone)').matches?'none':'block';
 render();
 </script>
