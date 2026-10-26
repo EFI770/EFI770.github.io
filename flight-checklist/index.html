@@ -70,7 +70,7 @@ document.getElementById('cancelReset').addEventListener('click',()=>document.get
 document.getElementById('confirmReset').addEventListener('click',()=>{state={checked:{},open:{}};save();render();document.getElementById('resetModal').style.display='none';toast('הצ׳קליסט אופס')});
 document.getElementById('closeCelebrate').addEventListener('click',()=>document.getElementById('celebrate').style.display='none');
 document.getElementById('share').addEventListener('click',async()=>{let text='✈️ צ׳קליסט טיסה: '+Math.round(done()/total()*100)+'% הושלם ('+done()+'/'+total()+')\n\n';SECTIONS.forEach((s,si)=>{const n=s.items.filter((_,ii)=>state.checked[si+'-'+ii]).length;text+=s.icon+' '+s.t+': '+n+'/'+s.items.length+'\n'});try{if(navigator.share){await navigator.share({title:'התקדמות צ׳קליסט טיסה',text});return}await navigator.clipboard.writeText(text);toast('ההתקדמות הועתקה 📋')}catch{const ta=document.createElement('textarea');ta.value=text;document.body.append(ta);ta.select();try{document.execCommand('copy');toast('ההתקדמות הועתקה 📋')}catch{prompt('העתיקו את ההתקדמות:',text)}ta.remove()}});
-if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=6', {updateViaCache:'none'}).catch(()=>{}));
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=7', {updateViaCache:'none'}).catch(()=>{}));
 document.getElementById('installHint').style.display=window.matchMedia('(display-mode: standalone)').matches?'none':'block';
 const A11Y_KEY='flight-checklist-accessibility-v1';
 const a11yDefaults={text:false,contrast:false,links:false,motion:false};
