@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0284c7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="צ׳קליסט טיסה">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon.svg">
+<title>צ׳קליסט הכנה לטיסה ✈️</title>
+<style>
+:root{color-scheme:light;--sky:#0284c7;--pale:#e0f2fe;--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--text:#0f172a;--muted:#64748b}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Rubik",Arial,sans-serif;line-height:1.6}
+button{font:inherit;cursor:pointer}
+.sticky{position:sticky;top:0;z-index:5;background:#ffffffef;backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.wrap{max-width:680px;margin:auto;padding:14px 14px 110px}
+.top{max-width:680px;margin:auto;padding:12px 16px}
+.brand{display:flex;align-items:center;gap:10px}.plane{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#0284c7,#38bdf8);color:white;font-size:23px}
+.progress{height:9px;border-radius:99px;background:#e2e8f0;overflow:hidden;margin-top:12px}.fill{height:100%;width:0;background:linear-gradient(90deg,#0284c7,#38bdf8);transition:width .25s}
+.muted{color:var(--muted);font-size:12px}.card{background:white;border:1px solid var(--border);border-radius:18px;overflow:hidden;margin:0 0 12px;box-shadow:0 2px 7px #0f172a0a}
+.head{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;border:0;background:white;padding:15px;text-align:right}
+.section-title{display:flex;align-items:center;gap:10px}.emoji{display:grid;place-items:center;flex-shrink:0;width:38px;height:38px;border-radius:12px;background:#f1f5f9;font-size:19px}
+.badge{font-size:12px;white-space:nowrap;border:1px solid var(--border);background:#f8fafc;padding:3px 9px;border-radius:99px;color:#475569}.badge.done{background:#dcfce7;border-color:#86efac;color:#166534}
+.item{display:flex;align-items:flex-start;gap:12px;padding:13px 15px;border-top:1px solid #f1f5f9;background:white;cursor:pointer}
+.item.checked{background:#f0f9ff}.item.checked .txt{text-decoration:line-through;color:#64748b}
+.check{width:25px;height:25px;border:2px solid #94a3b8;border-radius:8px;display:grid;place-items:center;flex-shrink:0;color:white;margin-top:1px}.checked .check{background:var(--sky);border-color:var(--sky)}
+.actions{display:flex;gap:9px;margin-top:20px}.btn{min-height:46px;border-radius:999px;border:1px solid var(--border);background:white;padding:0 18px;font-weight:600}.primary{background:#0f172a;color:white;border-color:#0f172a}.actions .primary{flex:1}
+.hint{background:linear-gradient(135deg,#0ea5e9,#0369a1);color:white;padding:14px 16px;border-radius:16px;margin-bottom:14px;font-size:13px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0f172a;color:white;padding:11px 18px;border-radius:99px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30;max-width:90vw}
+.modal{display:none;position:fixed;inset:0;z-index:20;background:#0f172a66;align-items:center;justify-content:center;padding:20px}.modal>div{background:white;border-radius:20px;padding:22px;width:100%;max-width:350px}
+@media(min-width:600px){.wrap{padding-top:20px}}
+</style>
+</head>
+<body>
+<header class="sticky"><div class="top">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div class="brand"><div class="plane">✈️</div><div><strong>צ׳קליסט הכנה לטיסה</strong><div class="muted">מהכרטיס ועד הנחיתה</div></div></div><strong id="percent" style="font-size:22px;color:var(--sky)">0%</strong></div>
+<div class="progress"><div id="fill" class="fill"></div></div><div id="count" class="muted" style="margin-top:5px">0 / 76 הושלמו</div>
+</div></header>
+<main class="wrap">
+<div id="installHint" class="hint"><strong>📲 להתקנה באייפון:</strong> פתחו בספארי → לחצו על שיתוף → <strong>הוסף למסך הבית</strong>.</div>
+<div id="list"></div>
+<div class="actions"><button class="btn primary" id="share">📋 העתק התקדמות</button><button class="btn" id="reset">↺ איפוס</button></div>
+<p class="muted" style="text-align:center;margin-top:14px">נשמר אוטומטית במכשיר • אפשר להשתמש גם ללא אינטרנט לאחר טעינה ראשונה</p>
+</main>
+<div id="resetModal" class="modal"><div><div style="font-size:22px">🗑️</div><strong style="font-size:18px">לאפס את כל הצ׳קליסט?</strong><p class="muted">כל הסימונים יימחקו מהמכשיר הזה.</p><div class="actions"><button class="btn" id="confirmReset" style="flex:1;background:#fee2e2">כן, אפס הכל</button><button class="btn" id="cancelReset" style="flex:1">ביטול</button></div></div></div>
+<div id="celebrate" class="modal"><div style="text-align:center"><div style="font-size:44px">🛫</div><strong style="font-size:22px">מוכנים להמראה! ✈️</strong><p>סיימתם את כל המשימות!</p><button class="btn primary" id="closeCelebrate" style="width:100%">יאללה טסים!</button></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+const SECTIONS=[
+{t:"מיד לאחר הזמנת הטיסה",icon:"🎫",items:["לשמור את אישור הזמנת הטיסה","לבדוק תאריך, שעות יציאה וחזרה","לבדוק שהשם בכרטיס זהה לשם בדרכון","לשמור מספר הזמנה ופרטי חברת התעופה","לבדוק אם הטיסה ישירה או עם קונקשן","להזמין מלון ולשמור את אישור ההזמנה","לתכנן הגעה לשדה התעופה וחזרה ממנו"]},
+{t:"דרכונים ומסמכים",icon:"🛂",items:["לבדוק שלכל נוסע יש דרכון בתוקף","לבדוק את תוקף הדרכון הנדרש במדינת היעד","לבדוק צורך בוויזה או באישור כניסה אלקטרוני","לבדוק דרישות כניסה ומסמכים מיוחדים במדינת היעד","לצלם את הדרכונים ולשמור עותק מאובטח","לשמור כרטיסי טיסה וכרטיסי עלייה למטוס","לשמור אישורי מלון, העברות וכרטיסים לאטרקציות","להכין מסמכים נדרשים לילדים אם רלוונטי"]},
+{t:"ביטוח, בריאות ותרופות",icon:"🏥",items:["לרכוש ביטוח נסיעות מתאים לכל הנוסעים","לבדוק כיסוי רפואי, כבודה וביטול או קיצור נסיעה","לבדוק צורך בחיסונים או בהיערכות רפואית מיוחדת","לארוז תרופות קבועות בכבודת היד","לבדוק אם מותר להכניס את התרופות למדינת היעד","להצטייד במרשמים או במסמכים רפואיים לפי הצורך","לשמור את מספר מוקד החירום של חברת הביטוח"]},
+{t:"מזוודות ואריזה",icon:"🧳",items:["לבדוק את משקל וגודל המזוודה המותר","לבדוק אם הכרטיס כולל מזוודה לבטן המטוס","לבדוק את מגבלות כבודת היד והתיק האישי","לארוז בגדים לפי מזג האוויר ומשך השהייה","לארוז נעליים, לבנים ובגדי שינה","לארוז כלי רחצה ומוצרי היגיינה","לארוז מטען לטלפון ולמכשירים נוספים","לבדוק מגבלות על נוזלים וחפצים אסורים בכבודת היד","לשים תג זיהוי על המזוודה","להשאיר מקום לקניות ולמזכרות"]},
+{t:"כסף, טלפון וטכנולוגיה",icon:"💳",items:["לוודא שכרטיס האשראי מתאים לשימוש בחו״ל","לבדוק עמלות משיכת מזומן והמרת מטבע","להכין מעט מזומן במטבע המתאים","להפעיל חבילת גלישה או eSIM לפי הצורך","להוריד מפות ומסמכים לשימוש ללא אינטרנט","לשמור כתובות ומספרי טלפון חשובים","לבדוק צורך במתאם חשמל","לבדוק שהטלפון והסוללה הניידת טעונים"]},
+{t:"יום לפני הטיסה",icon:"📋",items:["לבצע צ׳ק-אין באינטרנט אם אפשר","לבחור מושבים ולבדוק הקצאת מושבים למשפחה","להוריד או להדפיס כרטיסי עלייה למטוס","לבדוק שוב את שעת הטיסה והטרמינל","לבדוק עדכונים והודעות מחברת התעופה","לשקול ולסגור את המזוודות","להכין תיק יד עם דרכונים, כסף, תרופות ומטען","להזמין מונית או לוודא הסעה וחניה","להטעין את כל המכשירים","לבדוק את מזג האוויר ביעד"]},
+{t:"לפני היציאה מהבית",icon:"🏠",items:["לוודא שכל הדרכונים נמצאים בתיק היד","לוודא שהטלפונים והארנקים איתכם","לכבות מכשירים מיותרים ולבדוק חלונות ודלתות","לבדוק מים, חשמל ומכשירים לפי הצורך","לסדר אוכל מתכלה ואשפה","לוודא שיש מי שיטפל בדואר, בצמחים או בבעלי חיים","לצאת בזמן עם מרווח לעומסי תנועה"]},
+{t:"בנתב״ג ובשדה התעופה",icon:"✈️",items:["להגיע בזמן בהתאם להנחיות השדה וחברת התעופה","לעבור את הבידוק הביטחוני","למסור מזוודות ולקבל אישור מסירה","לעבור ביקורת דרכונים לפי הצורך","לעבור בידוק ביטחוני ולבדוק שלא נשכח דבר במגשים","לבדוק את מספר השער ושעת העלייה למטוס","להיות ליד השער בזמן","לוודא שהדרכון וכרטיס העלייה למטוס זמינים"]},
+{t:"בזמן הטיסה",icon:"☁️",items:["לשמור את הדרכון והמסמכים במקום בטוח","לשתות מים ולהתארגן לטיסה נוחה","לשמור על התרופות הנחוצות בהישג יד","לבדוק פרטי הגעה והסעה ביעד","לבדוק את כללי המכס והצהרת המוצרים אם רלוונטי"]},
+{t:"אחרי הנחיתה",icon:"🛬",items:["לעבור ביקורת גבולות","לאסוף את המזוודות ולבדוק שלא הוחלפו","לעבור במכס ולדווח לפי הדרישות","להפעיל את חבילת הגלישה המקומית","ליצור קשר עם הנהג או עם מקום הלינה","לשמור קבלות ומסמכים חשובים עד סוף הנסיעה"]}
+];
+const KEY='flight-checklist-v1';
+let state={checked:{},open:{}};
+try{const old=JSON.parse(localStorage.getItem(KEY)||'null');if(old&&typeof old==='object')state={checked:old.checked||{},open:old.open||{}}}catch{}
+const total=()=>SECTIONS.reduce((n,s)=>n+s.items.length,0);
+const done=()=>Object.values(state.checked).filter(Boolean).length;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch{}}
+function toast(s){const el=document.getElementById('toast');el.textContent=s;el.style.opacity='1';clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.style.opacity='0',2600)}
+function update(){const n=done(),p=Math.round(n/total()*100);document.getElementById('percent').textContent=p+'%';document.getElementById('fill').style.width=p+'%';document.getElementById('count').textContent=n+' / '+total()+' הושלמו';}
+function render(){const root=document.getElementById('list');root.replaceChildren();SECTIONS.forEach((s,si)=>{const n=s.items.filter((_,ii)=>state.checked[si+'-'+ii]).length,complete=n===s.items.length,open=!!state.open[si];const card=document.createElement('section');card.className='card';const head=document.createElement('button');head.className='head';head.setAttribute('aria-expanded',String(open));const left=document.createElement('div');left.className='section-title';const emoji=document.createElement('div');emoji.className='emoji';emoji.textContent=complete?'✓':s.icon;if(complete){emoji.style.background='#dcfce7';emoji.style.color='#166534'}const title=document.createElement('div');const t=document.createElement('strong');t.style.fontSize='14px';t.textContent=(si+1)+'. '+s.t;const sub=document.createElement('div');sub.className='muted';sub.textContent=n+'/'+s.items.length+' הושלמו';title.append(t,sub);left.append(emoji,title);const right=document.createElement('div');right.style.display='flex';right.style.alignItems='center';right.style.gap='8px';const badge=document.createElement('span');badge.className='badge'+(complete?' done':'');badge.textContent=complete?'הושלם ✓':n?n+'/'+s.items.length:'פתח';const arrow=document.createElement('span');arrow.textContent=open?'⌃':'⌄';right.append(badge,arrow);head.append(left,right);head.addEventListener('click',()=>{state.open[si]=!state.open[si];save();render()});card.append(head);if(open){s.items.forEach((txt,ii)=>{const key=si+'-'+ii,checked=!!state.checked[key];const label=document.createElement('label');label.className='item'+(checked?' checked':'');const box=document.createElement('span');box.className='check';box.textContent=checked?'✓':'';const span=document.createElement('span');span.className='txt';span.style.fontSize='14.5px';span.textContent=txt;label.append(box,span);label.addEventListener('click',e=>{e.preventDefault();state.checked[key]=!state.checked[key];save();render();update();if(done()===total()){document.getElementById('celebrate').style.display='flex'}});card.append(label)})}root.append(card)});update()}
+document.getElementById('reset').addEventListener('click',()=>document.getElementById('resetModal').style.display='flex');
+document.getElementById('cancelReset').addEventListener('click',()=>document.getElementById('resetModal').style.display='none');
+document.getElementById('confirmReset').addEventListener('click',()=>{state={checked:{},open:{}};save();render();document.getElementById('resetModal').style.display='none';toast('הצ׳קליסט אופס')});
+document.getElementById('closeCelebrate').addEventListener('click',()=>document.getElementById('celebrate').style.display='none');
+document.getElementById('share').addEventListener('click',async()=>{let text='✈️ צ׳קליסט טיסה: '+Math.round(done()/total()*100)+'% הושלם ('+done()+'/'+total()+')\n\n';SECTIONS.forEach((s,si)=>{const n=s.items.filter((_,ii)=>state.checked[si+'-'+ii]).length;text+=s.icon+' '+s.t+': '+n+'/'+s.items.length+'\n'});try{if(navigator.share){await navigator.share({title:'התקדמות צ׳קליסט טיסה',text});return}await navigator.clipboard.writeText(text);toast('ההתקדמות הועתקה 📋')}catch{const ta=document.createElement('textarea');ta.value=text;document.body.append(ta);ta.select();try{document.execCommand('copy');toast('ההתקדמות הועתקה 📋')}catch{prompt('העתיקו את ההתקדמות:',text)}ta.remove()}});
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+if(!window.matchMedia('(display-mode: standalone)').matches&&/iPhone|iPad|iPod/.test(navigator.userAgent)){document.getElementById('installHint').style.display='block'}else{document.getElementById('installHint').style.display='none'}
+render();
+</script>
+</body></html>
