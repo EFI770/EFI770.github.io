@@ -1,16 +1,16 @@
 {
-  "name": "צ׳קליסט הכנה לטיסה",
-  "short_name": "צ׳קליסט טיסה",
+  "name": "צ׳קליסט הכנה לטיסה | טוס טורס",
+  "short_name": "טוס טורס",
   "lang": "he",
   "dir": "rtl",
-  "start_url": "./",
+  "start_url": "./?v=3",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f8fafc",
-  "theme_color": "#0284c7",
+  "background_color": "#fbfaf8",
+  "theme_color": "#24205f",
   "icons": [
     {
-      "src": "./icon.svg",
+      "src": "./icon.svg?v=3",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
