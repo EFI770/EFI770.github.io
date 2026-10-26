@@ -3,40 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0284c7">
+<meta name="theme-color" content="#24205f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="צ׳קליסט טיסה">
 <link rel="manifest" href="./manifest.json">
-<link rel="icon" href="./icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="./icon.svg">
+<link rel="icon" href="./icon.svg?v=3" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon.svg?v=3">
 <title>צ׳קליסט הכנה לטיסה ✈️</title>
-<style>
-:root{color-scheme:light;--sky:#0284c7;--pale:#e0f2fe;--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--text:#0f172a;--muted:#64748b}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Rubik",Arial,sans-serif;line-height:1.6}
-button{font:inherit;cursor:pointer}
-.sticky{position:sticky;top:0;z-index:5;background:#ffffffef;backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
-.wrap{max-width:680px;margin:auto;padding:14px 14px 110px}
-.top{max-width:680px;margin:auto;padding:12px 16px}
-.brand{display:flex;align-items:center;gap:10px}.plane{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#0284c7,#38bdf8);color:white;font-size:23px}
-.progress{height:9px;border-radius:99px;background:#e2e8f0;overflow:hidden;margin-top:12px}.fill{height:100%;width:0;background:linear-gradient(90deg,#0284c7,#38bdf8);transition:width .25s}
-.muted{color:var(--muted);font-size:12px}.card{background:white;border:1px solid var(--border);border-radius:18px;overflow:hidden;margin:0 0 12px;box-shadow:0 2px 7px #0f172a0a}
-.head{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;border:0;background:white;padding:15px;text-align:right}
-.section-title{display:flex;align-items:center;gap:10px}.emoji{display:grid;place-items:center;flex-shrink:0;width:38px;height:38px;border-radius:12px;background:#f1f5f9;font-size:19px}
-.badge{font-size:12px;white-space:nowrap;border:1px solid var(--border);background:#f8fafc;padding:3px 9px;border-radius:99px;color:#475569}.badge.done{background:#dcfce7;border-color:#86efac;color:#166534}
-.item{display:flex;align-items:flex-start;gap:12px;padding:13px 15px;border-top:1px solid #f1f5f9;background:white;cursor:pointer}
-.item.checked{background:#f0f9ff}.item.checked .txt{text-decoration:line-through;color:#64748b}
-.check{width:25px;height:25px;border:2px solid #94a3b8;border-radius:8px;display:grid;place-items:center;flex-shrink:0;color:white;margin-top:1px}.checked .check{background:var(--sky);border-color:var(--sky)}
-.actions{display:flex;gap:9px;margin-top:20px}.btn{min-height:46px;border-radius:999px;border:1px solid var(--border);background:white;padding:0 18px;font-weight:600}.primary{background:#0f172a;color:white;border-color:#0f172a}.actions .primary{flex:1}
-.hint{background:linear-gradient(135deg,#0ea5e9,#0369a1);color:white;padding:14px 16px;border-radius:16px;margin-bottom:14px;font-size:13px}
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0f172a;color:white;padding:11px 18px;border-radius:99px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30;max-width:90vw}
-.modal{display:none;position:fixed;inset:0;z-index:20;background:#0f172a66;align-items:center;justify-content:center;padding:20px}.modal>div{background:white;border-radius:20px;padding:22px;width:100%;max-width:350px}
-@media(min-width:600px){.wrap{padding-top:20px}}
-</style>
+<style>:root{color-scheme:light;--navy:#24205f;--navy2:#30296f;--wine:#8b3047;--gold:#e0a02b;--paper:#fbfaf8;--white:#fff;--line:#e6e1df;--muted:#686779}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;background:var(--paper);color:var(--navy);font-family:system-ui,-apple-system,"Rubik",Arial,sans-serif;line-height:1.6}button{font:inherit;cursor:pointer}
+.sticky{position:sticky;top:0;z-index:5;background:#fffdfbf2;backdrop-filter:blur(14px);border-bottom:3px solid var(--gold);box-shadow:0 3px 14px #24205f0c}
+.wrap{max-width:680px;margin:auto;padding:16px 14px 110px}.top{max-width:680px;margin:auto;padding:12px 16px}
+.brand{display:flex;align-items:center;gap:12px}.brandmark{width:64px;height:64px;object-fit:contain;border-radius:12px;flex-shrink:0}.brandcopy{min-width:0}.brandcopy strong{display:block;font-size:18px;line-height:1.25;font-weight:900;letter-spacing:-.3px}.brandcopy .tagline{font-size:11px;font-weight:700;color:var(--wine)}
+.progress{height:10px;border-radius:99px;background:#e8e6ed;overflow:hidden;margin-top:12px;border:1px solid #dedbe6}.fill{height:100%;width:0;background:linear-gradient(90deg,var(--wine),var(--gold));transition:width .25s}
+.muted{color:var(--muted);font-size:12px}.card{background:var(--white);border:1px solid var(--line);border-radius:17px;overflow:hidden;margin:0 0 12px;box-shadow:0 3px 10px #24205f0a;border-top:3px solid var(--navy)}
+.head{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;border:0;background:white;padding:15px;text-align:right;color:var(--navy)}
+.section-title{display:flex;align-items:center;gap:10px}.emoji{display:grid;place-items:center;flex-shrink:0;width:40px;height:40px;border-radius:12px;background:#f0eef8;border:1px solid #e3dfef;font-size:19px;color:var(--navy)}
+.badge{font-size:12px;white-space:nowrap;border:1px solid #dedbe6;background:#f7f6fa;padding:3px 9px;border-radius:99px;color:var(--navy)}.badge.done{background:#f8edda;border-color:#e7c47e;color:#684718}
+.item{display:flex;align-items:flex-start;gap:12px;padding:13px 15px;border-top:1px solid #f3f0ee;background:white;cursor:pointer}.item.checked{background:#faf5f3}.item.checked .txt{text-decoration:line-through;color:#797687}
+.check{width:25px;height:25px;border:2px solid #a6a2b7;border-radius:8px;display:grid;place-items:center;flex-shrink:0;color:white;margin-top:1px}.checked .check{background:var(--navy);border-color:var(--gold)}
+.actions{display:flex;gap:9px;margin-top:20px}.btn{min-height:46px;border-radius:999px;border:1px solid #d8d5e2;background:white;padding:0 18px;font-weight:700;color:var(--navy)}.primary{background:var(--navy);color:white;border-color:var(--navy)}.actions .primary{flex:1}
+.hint{background:linear-gradient(125deg,var(--navy),#383174);color:white;padding:16px;border-radius:16px;margin-bottom:14px;font-size:13px;border-right:5px solid var(--gold);box-shadow:0 6px 18px #24205f18}.hint b{color:#ffd982}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);color:white;padding:11px 18px;border-radius:99px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30;max-width:90vw}
+.modal{display:none;position:fixed;inset:0;z-index:20;background:#17143e77;align-items:center;justify-content:center;padding:20px}.modal>div{background:white;border-radius:20px;padding:22px;width:100%;max-width:350px;color:var(--navy)}
+@media(min-width:600px){.wrap{padding-top:20px}.brandmark{width:72px;height:72px}}</style>
 </head>
 <body>
 <header class="sticky"><div class="top">
-<div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div class="brand"><div class="plane">✈️</div><div><strong>צ׳קליסט הכנה לטיסה</strong><div class="muted">מהכרטיס ועד הנחיתה</div></div></div><strong id="percent" style="font-size:22px;color:var(--sky)">0%</strong></div>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div class="brand"><img class="brandmark" src="./icon.svg?v=3" alt="לוגו טוס טורס"><div class="brandcopy"><strong>צ׳קליסט הכנה לטיסה</strong><div class="tagline">טסים בראש שקט • מהכרטיס ועד הנחיתה</div></div></div><strong id="percent" style="font-size:22px;color:var(--wine)">0%</strong></div>
 <div class="progress"><div id="fill" class="fill"></div></div><div id="count" class="muted" style="margin-top:5px">0 / 76 הושלמו</div>
 </div></header>
 <main class="wrap">
