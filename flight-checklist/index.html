@@ -14,7 +14,7 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;background:var(--paper);color:var(--navy);font-family:system-ui,-apple-system,"Rubik",Arial,sans-serif;line-height:1.6}button{font:inherit;cursor:pointer}
 .sticky{position:sticky;top:0;z-index:5;background:#fffdfbf2;backdrop-filter:blur(14px);border-bottom:3px solid var(--gold);box-shadow:0 3px 14px #24205f0c}
 .wrap{max-width:680px;margin:auto;padding:16px 14px 110px}.top{max-width:680px;margin:auto;padding:12px 16px}
-.brand{display:flex;align-items:center;gap:12px}.brandmark{width:64px;height:64px;object-fit:contain;border-radius:12px;flex-shrink:0}.brandcopy{min-width:0}.brandcopy strong{display:block;font-size:18px;line-height:1.25;font-weight:900;letter-spacing:-.3px}.brandcopy .tagline{font-size:11px;font-weight:700;color:var(--wine)}
+.brand{display:flex;align-items:center;gap:12px}.brandmark{width:108px;height:96px;object-fit:contain;border-radius:0;flex-shrink:0}.brandcopy{min-width:0}.brandcopy strong{display:block;font-size:17px;line-height:1.25;font-weight:850;letter-spacing:-.3px}.brandcopy .tagline{font-size:11px;font-weight:700;color:var(--wine)}
 .progress{height:10px;border-radius:99px;background:#e8e6ed;overflow:hidden;margin-top:12px;border:1px solid #dedbe6}.fill{height:100%;width:0;background:linear-gradient(90deg,var(--wine),var(--gold));transition:width .25s}
 .muted{color:var(--muted);font-size:12px}.card{background:var(--white);border:1px solid var(--line);border-radius:17px;overflow:hidden;margin:0 0 12px;box-shadow:0 3px 10px #24205f0a;border-top:3px solid var(--navy)}
 .head{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;border:0;background:white;padding:15px;text-align:right;color:var(--navy)}
@@ -26,11 +26,11 @@
 .hint{background:linear-gradient(125deg,var(--navy),#383174);color:white;padding:16px;border-radius:16px;margin-bottom:14px;font-size:13px;border-right:5px solid var(--gold);box-shadow:0 6px 18px #24205f18}.hint b{color:#ffd982}
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);color:white;padding:11px 18px;border-radius:99px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30;max-width:90vw}
 .modal{display:none;position:fixed;inset:0;z-index:20;background:#17143e77;align-items:center;justify-content:center;padding:20px}.modal>div{background:white;border-radius:20px;padding:22px;width:100%;max-width:350px;color:var(--navy)}
-@media(min-width:600px){.wrap{padding-top:20px}.brandmark{width:72px;height:72px}}</style>
+@media(min-width:600px){.wrap{padding-top:20px}.brandmark{width:120px;height:104px}}</style>
 </head>
 <body>
 <header class="sticky"><div class="top">
-<div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div class="brand"><img class="brandmark" src="./icon.svg?v=4" alt="לוגו טוס טורס"><div class="brandcopy"><strong>צ׳קליסט הכנה לטיסה</strong><div class="tagline">טסים בראש שקט • מהכרטיס ועד הנחיתה</div></div></div><strong id="percent" style="font-size:22px;color:var(--wine)">0%</strong></div>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div class="brand"><img class="brandmark" src="./icon.svg?v=5" alt="לוגו טוס טורס"><div class="brandcopy"><strong>צ׳קליסט הכנה לטיסה</strong><div class="tagline">טסים בראש שקט • מהכרטיס ועד הנחיתה</div></div></div><strong id="percent" style="font-size:22px;color:var(--wine)">0%</strong></div>
 <div class="progress"><div id="fill" class="fill"></div></div><div id="count" class="muted" style="margin-top:5px">0 / 76 הושלמו</div>
 </div></header>
 <main class="wrap">
