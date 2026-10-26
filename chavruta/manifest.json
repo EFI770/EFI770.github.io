@@ -1,0 +1,13 @@
+{
+"name":"חברותא — מחברים בין אנשים",
+"short_name":"חברותא",
+"description":"מציאת שותף ללימוד תורה בקהילה",
+"lang":"he",
+"dir":"rtl",
+"start_url":"./",
+"scope":"./",
+"display":"standalone",
+"background_color":"#fbfcf9",
+"theme_color":"#173e32",
+"icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
