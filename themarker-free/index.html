@@ -151,34 +151,24 @@
     return html;
   }
 
-  function gdeltQuery(terms, lang, mode){
-    var q = terms.map(function(t){ return '"' + t.replace(/"/g,'') + '"'; }).join(mode === 'and' ? ' AND ' : ' OR ');
-    if (lang) q = '(' + q + ') sourcelang:' + lang;
-    return 'https://api.gdeltproject.org/api/v2/doc/doc?query=' + encodeURIComponent(q)
-      + '&mode=artlist&maxrecords=12&format=json&timespan=3months&sort=datedesc';
-  }
-
-  function renderAlternatives(title, kws, articles){
-    var html = '<div class="card"><h2>סיקור חינמי של אותו סיפור</h2>';
-    if (articles && articles.length){
-      html += '<ul class="results">' + articles.map(function(a){
-        var d = (a.seendate||'').slice(0,8);
-        var ds = d ? d.slice(6,8)+'.'+d.slice(4,6)+'.'+d.slice(0,4) : '';
-        var same = hostOf(a.url).indexOf('themarker') >= 0;
-        return '<li><a href="' + esc(a.url) + '" target="_blank" rel="noopener">' + esc(a.title) + '</a>'
-          + ' <span class="src">' + esc(hostOf(a.url)) + (ds ? ' · ' + ds : '') + (same ? ' · (דה מרקר עצמו)' : '') + '</span></li>';
-      }).join('') + '</ul>';
-    } else {
-      html += '<div class="hint">לא נמצאו תוצאות אוטומטיות כרגע. אפשר לחפש ידנית:</div>';
-    }
-    var q = encodeURIComponent(kws.slice(0,5).join(' '));
+  function renderAlternatives(title, kws){
     var qt = encodeURIComponent(title);
-    html += '<div class="fallback" style="margin-top:12px;font-size:.95rem">'
-      + 'חיפושים מוכנים: '
-      + '<a target="_blank" rel="noopener" href="https://news.google.com/search?q=' + qt + '&hl=he&gl=IL&ceid=IL:he">גוגל חדשות בעברית</a> · '
-      + '<a target="_blank" rel="noopener" href="https://news.google.com/search?q=' + q + '&hl=en-US&gl=US&ceid=US:en">גוגל חדשות באנגלית</a> · '
-      + '<a target="_blank" rel="noopener" href="https://www.google.com/search?q=' + qt + '">חיפוש גוגל</a>'
-      + '</div></div>';
+    var latin = kws.filter(function(w){ return /[A-Za-z]/.test(w); }).slice(0,4).join(' ');
+    var qe = encodeURIComponent(latin || title);
+    function gNews(q, hl, gl, ceid){ return 'https://news.google.com/search?q=' + q + '&hl=' + hl + '&gl=' + gl + '&ceid=' + ceid; }
+    function gSite(site){ return 'https://www.google.com/search?q=' + encodeURIComponent(title + ' site:' + site); }
+    var html = '<div class="card"><h2>איפה מסקרים את אותו סיפור בחינם</h2>'
+      + '<div class="hint">לחיצה פותחת חיפוש מוכן בלשונית חדשה. האתרים החינמיים בעברית: כלכליסט, גלובס (חלקית), וואלה, ynet, אייס, גיקטיים.</div>'
+      + '<ul class="results">'
+      + '<li><a target="_blank" rel="noopener" href="' + gNews(qt,'he','IL','IL:he') + '">גוגל חדשות בעברית</a> <span class="src">news.google.com</span></li>'
+      + '<li><a target="_blank" rel="noopener" href="' + gNews(qe,'en-US','US','US:en') + '">גוגל חדשות באנגלית</a> <span class="src">news.google.com</span></li>'
+      + '<li><a target="_blank" rel="noopener" href="' + gSite('calcalist.co.il') + '">כלכליסט</a> <span class="src">calcalist.co.il</span></li>'
+      + '<li><a target="_blank" rel="noopener" href="' + gSite('globes.co.il') + '">גלובס</a> <span class="src">globes.co.il</span></li>'
+      + '<li><a target="_blank" rel="noopener" href="' + gSite('walla.co.il') + '">וואלה</a> <span class="src">walla.co.il</span></li>'
+      + '<li><a target="_blank" rel="noopener" href="' + gSite('ynet.co.il') + '">ynet</a> <span class="src">ynet.co.il</span></li>'
+      + '<li><a target="_blank" rel="noopener" href="' + gSite('ice.co.il') + '">אייס</a> <span class="src">ice.co.il</span></li>'
+      + '<li><a target="_blank" rel="noopener" href="' + gSite('geektime.co.il') + '">גיקטיים</a> <span class="src">geektime.co.il</span></li>'
+      + '</ul></div>';
     return html;
   }
 
@@ -202,37 +192,8 @@
       goBtn.disabled = false; return;
     }
     kws = keywordsFromTitle(article.title);
-    outEl.innerHTML = renderArticle(article, pageUrl);
-
-    setStatus('מחפש סיקור חינמי מקביל…');
-    var found = [];
-    try {
-      // distinctive terms first: Latin entities, then longer Hebrew words
-      var ranked = kws.slice().sort(function(a,b){
-        var la = /[A-Za-z]/.test(a) ? 0 : 1, lb = /[A-Za-z]/.test(b) ? 0 : 1;
-        return la - lb || b.length - a.length;
-      });
-      var latinKws = ranked.filter(function(w){ return /[A-Za-z]/.test(w); });
-      var queries = [];
-      queries.push(gdeltQuery(ranked.slice(0,3), 'hebrew', 'or'));
-      if (latinKws.length >= 2) queries.push(gdeltQuery(latinKws.slice(0,3), 'english', 'and'));
-      var seen = {};
-      for (var i=0;i<queries.length;i++){
-        var r = await fetch(queries[i]);
-        if (!r.ok) continue;
-        var j = await r.json();
-        (j.articles || []).forEach(function(a){
-          if (!a.url || seen[a.url]) return;
-          seen[a.url] = 1;
-          found.push({ url: a.url, title: a.title || a.url, seendate: a.seendate });
-        });
-        if (i < queries.length - 1) await new Promise(function(res2){ setTimeout(res2, 5200); });
-      }
-      found = found.slice(0, 12);
-    } catch(e){ /* fallback links still render */ }
-
     setStatus('');
-    outEl.innerHTML = renderArticle(article, pageUrl) + renderAlternatives(article.title, kws, found);
+    outEl.innerHTML = renderArticle(article, pageUrl) + renderAlternatives(article.title, kws);
     goBtn.disabled = false;
   }
 
