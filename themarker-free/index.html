@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מרקר פתוח — מה אפשר לקרוא בחינם</title>
+<meta name="description" content="מדביקים קישור לכתבה בדה מרקר ומקבלים את מה שפתוח לקריאה, וקישורים לסיקור חינמי של אותו סיפור. בלי מנוי, בלי עקיפת חסימות.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&family=Frank+Ruhl+Libre:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#faf6f0; --card:#ffffff; --ink:#2b2620; --muted:#7a7266;
+    --accent:#b3541e; --accent-soft:#f6e4d7; --line:#e8dfd2; --ok:#2e7d4f; --warn:#9a6a00;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Assistant',system-ui,sans-serif;line-height:1.6}
+  .wrap{max-width:720px;margin:0 auto;padding:24px 18px 64px}
+  header{text-align:center;margin:18px 0 26px}
+  h1{font-family:'Frank Ruhl Libre',serif;font-size:1.9rem;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:1rem;margin:0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 18px;margin:14px 0;box-shadow:0 1px 3px rgba(60,40,20,.05)}
+  label{font-weight:600;display:block;margin-bottom:8px}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  input[type=url],input[type=text]{flex:1;min-width:220px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:1rem;direction:ltr;text-align:left;background:#fffdfa}
+  button{cursor:pointer;border:none;border-radius:10px;padding:12px 20px;font-family:inherit;font-size:1rem;font-weight:600;background:var(--accent);color:#fff}
+  button:disabled{opacity:.55;cursor:default}
+  button.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+  .hint{color:var(--muted);font-size:.86rem;margin-top:8px}
+  .status{color:var(--muted);font-size:.95rem;padding:6px 2px}
+  .badge{display:inline-block;border-radius:999px;padding:2px 12px;font-size:.82rem;font-weight:600}
+  .badge.locked{background:#fdeceb;color:#a33b2e}
+  .badge.open{background:#e7f4ec;color:var(--ok)}
+  h2{font-family:'Frank Ruhl Libre',serif;font-size:1.25rem;margin:0 0 10px}
+  .art-title{font-family:'Frank Ruhl Libre',serif;font-size:1.3rem;line-height:1.45;margin:0 0 4px}
+  .meta{color:var(--muted);font-size:.9rem;margin-bottom:10px}
+  .teaser{white-space:pre-wrap}
+  .locked-note{background:var(--accent-soft);border-radius:10px;padding:10px 14px;font-size:.95rem;margin-top:12px}
+  ul.results{list-style:none;margin:0;padding:0}
+  ul.results li{border-top:1px solid var(--line);padding:10px 0}
+  ul.results li:first-child{border-top:none}
+  ul.results a{color:var(--accent);text-decoration:none;font-weight:600}
+  ul.results a:hover{text-decoration:underline}
+  .src{color:var(--muted);font-size:.85rem;direction:ltr;display:inline-block}
+  .fallback a{color:var(--accent)}
+  footer{margin-top:34px;color:var(--muted);font-size:.84rem;text-align:center}
+  .err{color:#a33b2e;font-size:.95rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>מרקר פתוח</h1>
+    <p class="sub">מדביקים קישור לכתבה בדה מרקר — ורואים מה אפשר לקרוא בחינם ובאיזה מקורות חינמיים מסקרים את אותו הסיפור.</p>
+  </header>
+
+  <div class="card">
+    <label for="url">קישור לכתבה</label>
+    <div class="row">
+      <input id="url" type="url" placeholder="https://www.themarker.com/..." autocomplete="off">
+      <button id="go">בדיקה</button>
+    </div>
+    <div class="hint">הכלי לא עוקף מנוי ולא פותח תוכן נעול. הוא מציג רק את מה שהאתר מפרסם בגלוי לכל גולש, ומוצא סיקור חינמי מקביל.</div>
+  </div>
+
+  <div id="status" class="status" role="status"></div>
+  <div id="out"></div>
+
+  <footer>
+    נבנה ככלי אישי חינמי. התוכן באתרים החיצוניים שייך לבעליו. אם כתבה נעולה למנויים — הטקסט המלא נשאר אצלם.
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var urlEl = document.getElementById('url'),
+      goBtn = document.getElementById('go'),
+      statusEl = document.getElementById('status'),
+      outEl = document.getElementById('out');
+
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function setStatus(t){ statusEl.textContent = t || ''; }
+  function cleanUrl(raw){
+    var u = new URL(raw.trim());
+    ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','fbclid','gclid'].forEach(function(p){ u.searchParams.delete(p); });
+    return u.toString();
+  }
+  function hostOf(u){ try { return new URL(u).hostname.replace(/^www\./,''); } catch(e){ return ''; } }
+
+  function parseJina(md, pageUrl){
+    // jina reader format: "Title: ...", "URL Source: ...", "Published Time: ...", then "Markdown Content:"
+    var title = '', published = '', body = '';
+    var m = md.match(/^Title:\s*(.+)$/m); if (m) title = m[1].trim();
+    m = md.match(/^Published Time:\s*(.+)$/m); if (m) published = m[1].trim();
+    var ci = md.indexOf('Markdown Content:');
+    if (ci >= 0) body = md.slice(ci + 'Markdown Content:'.length); else body = md;
+    // strip markdown links/images lightly, keep readable text lines
+    var lines = body.split('\n').map(function(l){
+      return l.replace(/!\[[^\]]*\]\([^)]*\)/g,'')
+              .replace(/\[([^\]]*)\]\([^)]*\)/g,'$1')
+              .replace(/^#+\s*/,'')
+              .trim();
+    });
+    var locked = /תוכן זה זמין למנויים בלבד|זמין למנויים בלבד|לרכישת מינוי/.test(body);
+    // open text = substantive lines between the headline and the paywall marker,
+    // skipping buttons/promos/nav boilerplate
+    var skip = /מינוי|פרסומת|themarker\.com|haarets\.co\.il|Image \d|^\d{2}:\d{2}|^עקוב|^הרחבה|^שמירה|^טוען|^ניווט|^התחברות|^פרטי חשבון|^מיקומך|^שלחו את הכתבה|^שיתוף|^הדפסת כתבה|^תגובות|^קריאת זן|^רוצה לקרוא תקציר|^לחצו לקבלת עדכונים|^כבר מנויים|^כתבות |^הכתבות |^משלוח תגובה|^גלריה|^לרכישה|^ללא פרסומות|^הסיפורים שמעצבים/;
+    var keep = [], seenTitle = false, author = '';
+    for (var i=0;i<lines.length;i++){
+      var l = lines[i];
+      if (!l) continue;
+      if (/תוכן זה זמין למנויים/.test(l)) break;
+      if (!seenTitle){
+        if (title && l.indexOf(title.slice(0,20)) >= 0) { seenTitle = true; continue; }
+        continue; // skip nav/boilerplate before the headline
+      }
+      if (/^אקונומיסט$/.test(l)) { author = 'אקונומיסט'; continue; }
+      if (skip.test(l)) continue;
+      if (l.length < 60) continue;
+      keep.push(l);
+      if (keep.length >= 3 || keep.join(' ').length > 1400) break;
+    }
+    return { title: title, published: published, author: author, teaser: keep.join('\n\n').slice(0,1400), locked: locked };
+  }
+
+  function keywordsFromTitle(title){
+    var he = title.replace(/[\u0591-\u05C7]/g,'');
+    var latin = (he.match(/[A-Za-z][A-Za-z0-9.\-]{2,}/g) || []);
+    var words = he.replace(/[^\u05D0-\u05EA0-9A-Za-z\s.\-]/g,' ').split(/\s+/)
+      .filter(function(w){ return w.length >= 3; })
+      .filter(function(w){ return ['של','על','עם','את','אל','זה','זו','אחרי','בין','כי','אבל','גם','עד','כל','אין','יש','או','כמו','מה','לא','הוא','היא','הם','יותר','מול','בלי','רק','עוד','כבר','אם','למה','איך','מתי','השנה','החדש','החדשה','עומד','עומדת'].indexOf(w) < 0; });
+    var uniq = []; latin.concat(words).forEach(function(w){ if (uniq.indexOf(w) < 0) uniq.push(w); });
+    return uniq.slice(0, 6);
+  }
+
+  function renderArticle(a, pageUrl){
+    var dateStr = '';
+    if (a.published){ var d = new Date(a.published); if (!isNaN(d)) dateStr = d.toLocaleDateString('he-IL',{day:'numeric',month:'long',year:'numeric'}); }
+    var html = '<div class="card">'
+      + (a.locked ? '<span class="badge locked">הכתבה המלאה למנויים</span>' : '<span class="badge open">נראה פתוח לקריאה</span>')
+      + '<h2 class="art-title" style="margin-top:10px">' + esc(a.title || 'כתבה') + '</h2>'
+      + '<div class="meta">' + esc(hostOf(pageUrl)) + (dateStr ? ' · ' + esc(dateStr) : '') + (a.author ? ' · תרגום: ' + esc(a.author) : '') + '</div>';
+    if (a.teaser){
+      html += '<div class="teaser">' + esc(a.teaser) + '</div>';
+    }
+    if (a.locked){
+      html += '<div class="locked-note">זה כל מה שהאתר מציג בגלוי בלי מנוי. את הטקסט המלא אי אפשר לראות בחינם — אבל אפשר למצוא סיקור חינמי של אותו סיפור:</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function gdeltQuery(terms, lang, mode){
+    var q = terms.map(function(t){ return '"' + t.replace(/"/g,'') + '"'; }).join(mode === 'and' ? ' AND ' : ' OR ');
+    if (lang) q = '(' + q + ') sourcelang:' + lang;
+    return 'https://api.gdeltproject.org/api/v2/doc/doc?query=' + encodeURIComponent(q)
+      + '&mode=artlist&maxrecords=12&format=json&timespan=3months&sort=datedesc';
+  }
+
+  function renderAlternatives(title, kws, articles){
+    var html = '<div class="card"><h2>סיקור חינמי של אותו סיפור</h2>';
+    if (articles && articles.length){
+      html += '<ul class="results">' + articles.map(function(a){
+        var d = (a.seendate||'').slice(0,8);
+        var ds = d ? d.slice(6,8)+'.'+d.slice(4,6)+'.'+d.slice(0,4) : '';
+        var same = hostOf(a.url).indexOf('themarker') >= 0;
+        return '<li><a href="' + esc(a.url) + '" target="_blank" rel="noopener">' + esc(a.title) + '</a>'
+          + ' <span class="src">' + esc(hostOf(a.url)) + (ds ? ' · ' + ds : '') + (same ? ' · (דה מרקר עצמו)' : '') + '</span></li>';
+      }).join('') + '</ul>';
+    } else {
+      html += '<div class="hint">לא נמצאו תוצאות אוטומטיות כרגע. אפשר לחפש ידנית:</div>';
+    }
+    var q = encodeURIComponent(kws.slice(0,5).join(' '));
+    var qt = encodeURIComponent(title);
+    html += '<div class="fallback" style="margin-top:12px;font-size:.95rem">'
+      + 'חיפושים מוכנים: '
+      + '<a target="_blank" rel="noopener" href="https://news.google.com/search?q=' + qt + '&hl=he&gl=IL&ceid=IL:he">גוגל חדשות בעברית</a> · '
+      + '<a target="_blank" rel="noopener" href="https://news.google.com/search?q=' + q + '&hl=en-US&gl=US&ceid=US:en">גוגל חדשות באנגלית</a> · '
+      + '<a target="_blank" rel="noopener" href="https://www.google.com/search?q=' + qt + '">חיפוש גוגל</a>'
+      + '</div></div>';
+    return html;
+  }
+
+  async function run(){
+    var raw = urlEl.value;
+    if (!raw.trim()){ setStatus('מדביקים קישור קודם.'); return; }
+    var pageUrl;
+    try { pageUrl = cleanUrl(raw); } catch(e){ setStatus('הקישור לא נראה תקין.'); return; }
+    goBtn.disabled = true; outEl.innerHTML = ''; setStatus('שולף את הכתבה…');
+
+    var article = null, kws = [];
+    try {
+      var res = await fetch('https://r.jina.ai/' + pageUrl, { headers: { 'Accept': 'text/plain' } });
+      if (!res.ok) throw new Error('reader ' + res.status);
+      var md = await res.text();
+      article = parseJina(md, pageUrl);
+      if (!article.title) throw new Error('no title');
+    } catch(e){
+      setStatus('');
+      outEl.innerHTML = '<div class="card err">לא הצלחתי לשלוף את הדף (שירות הקריאה החינמי עמוס או שהקישור שגוי). נסו שוב בעוד דקה, או בדקו את הקישור.</div>';
+      goBtn.disabled = false; return;
+    }
+    kws = keywordsFromTitle(article.title);
+    outEl.innerHTML = renderArticle(article, pageUrl);
+
+    setStatus('מחפש סיקור חינמי מקביל…');
+    var found = [];
+    try {
+      // distinctive terms first: Latin entities, then longer Hebrew words
+      var ranked = kws.slice().sort(function(a,b){
+        var la = /[A-Za-z]/.test(a) ? 0 : 1, lb = /[A-Za-z]/.test(b) ? 0 : 1;
+        return la - lb || b.length - a.length;
+      });
+      var latinKws = ranked.filter(function(w){ return /[A-Za-z]/.test(w); });
+      var queries = [];
+      queries.push(gdeltQuery(ranked.slice(0,3), 'hebrew', 'or'));
+      if (latinKws.length >= 2) queries.push(gdeltQuery(latinKws.slice(0,3), 'english', 'and'));
+      var seen = {};
+      for (var i=0;i<queries.length;i++){
+        var r = await fetch(queries[i]);
+        if (!r.ok) continue;
+        var j = await r.json();
+        (j.articles || []).forEach(function(a){
+          if (!a.url || seen[a.url]) return;
+          seen[a.url] = 1;
+          found.push({ url: a.url, title: a.title || a.url, seendate: a.seendate });
+        });
+        if (i < queries.length - 1) await new Promise(function(res2){ setTimeout(res2, 5200); });
+      }
+      found = found.slice(0, 12);
+    } catch(e){ /* fallback links still render */ }
+
+    setStatus('');
+    outEl.innerHTML = renderArticle(article, pageUrl) + renderAlternatives(article.title, kws, found);
+    goBtn.disabled = false;
+  }
+
+  goBtn.addEventListener('click', run);
+  urlEl.addEventListener('keydown', function(e){ if (e.key === 'Enter') run(); });
+
+  var pre = new URLSearchParams(location.search).get('url');
+  if (pre){ urlEl.value = pre; run(); }
+})();
+</script>
+</body>
+</html>
