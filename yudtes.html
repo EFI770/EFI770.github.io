@@ -72,7 +72,7 @@ var LOCATION="בבית משפחת רייניץ, כפר רתמים";
 var TEMPLATE="שלום [שם] היקר!\n\nרציתי להזמין אותך באופן אישי להצטרף אלינו להתוועדות חגיגית לכבוד י״ט בכסלו, חג הגאולה של האדמו״ר הזקן בעל התניא וראש השנה לחסידות.\n\nההתוועדות תתקיים ב[תאריך], בשעה [שעה], ב[מיקום].\n\nנשמח מאוד לראות אותך איתנו, להתוועד יחד, לשמוע דברי חסידות, כיבוד עשיר, לחיים ולברכה!\n\nמקווים לראותך!\nבהערכה ובאהבה ❤️";
 var contacts=[],filter="all",search="";
 var toast=document.getElementById("toast");
-function esc(s){return String(s).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,""");}
+function esc(s){s=String(s);return s.split("&").join("&"+"amp;").split("<").join("&"+"lt;").split(">").join("&"+"gt;").split('"').join("&"+"quot;");}
 function genderLabel(g){return g==="male"?"גבר":g==="female"?"אישה":g==="org"?"ארגון / שירות":"לא ידוע";}
 function buildMsg(c){var first=c.first||(c.name||"").split(/\s+/)[0]||c.name;var msg=TEMPLATE.replaceAll("[שם]",first).replaceAll("[תאריך]",EVENT_DATE).replaceAll("[שעה]",EVENT_TIME).replaceAll("[מיקום]",LOCATION);if(c.gender==="female")msg=msg.replace(/היקר(?!ה)/g,"היקרה");if(c.gender==="male")msg=msg.replaceAll("היקרה","היקר");return msg;}
 function showToast(t){toast.textContent=t;toast.classList.add("show");setTimeout(function(){toast.classList.remove("show");},2000);}
